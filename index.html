@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keystroke collector</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen flex flex-col items-center justify-center">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Keystroke Collector</h1>
+    
+    <div id="output" class="bg-white p-8 rounded-lg shadow-lg w-3/4 min-h-[200px] text-xl break-all mb-4">
+        Start typing anywhere on the page...
+    </div>
+
+    <div class="flex gap-8 mb-4 text-gray-600">
+        <div class="flex items-center">
+            <span class="font-semibold mr-2">Characters:</span>
+            <span id="charCount" class="text-lg">0</span>
+        </div>
+        <div class="flex items-center">
+            <span class="font-semibold mr-2">Time since last keystroke:</span>
+            <span id="timeSinceKey" class="text-lg">0s</span>
+        </div>
+    </div>
+
+    <button id="clearButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+        Clear Text
+    </button>
+
+    <script>
+        const output = document.getElementById('output');
+        const clearButton = document.getElementById('clearButton');
+        const charCount = document.getElementById('charCount');
+        const timeSinceKey = document.getElementById('timeSinceKey');
+        let collectedKeys = '';
+        let lastKeystrokeTime = Date.now();
+        let timerInterval;
+
+        function updateTimer() {
+            const secondsElapsed = Math.floor((Date.now() - lastKeystrokeTime) / 1000);
+            timeSinceKey.textContent = `${secondsElapsed}s`;
+        }
+
+        // Start the timer update interval
+        timerInterval = setInterval(updateTimer, 1000);
+
+        document.addEventListener('keydown', (event) => {
+            // Update last keystroke time
+            lastKeystrokeTime = Date.now();
+            
+            // Handle backspace
+            if (event.key === 'Backspace') {
+                collectedKeys = collectedKeys.slice(0, -1);
+            }
+            // Handle regular characters
+            else if (event.key.length === 1) {
+                collectedKeys += event.key;
+            }
+            // Handle Enter key
+            else if (event.key === 'Enter') {
+                collectedKeys += '\n';
+            }
+
+            // Update display
+            updateDisplay();
+        });
+
+        clearButton.addEventListener('click', () => {
+            collectedKeys = '';
+            lastKeystrokeTime = Date.now();
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            output.textContent = collectedKeys || 'Start typing anywhere on the page...';
+            charCount.textContent = collectedKeys.length;
+            updateTimer();
+        }
+    </script>
+</body>
+</html>
